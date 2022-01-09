@@ -1,7 +1,7 @@
 // @ts-ignore
 export { version } from '../package.json';
 
-enum TokenType {
+export enum TokenTypeEnum {
   REQUIRED_GROUP = 'requiredGroup',
   FORBIDDEN_GROUP = 'forbiddenGroup',
 	OPTIONAL_GROUP = 'optionalGroup',
@@ -15,40 +15,42 @@ enum TokenType {
 	OPTIONAL_WORD = 'optionalWord',
 };
 
+export const TokenType = {...TokenTypeEnum};
+
 enum NonTokenType {
 	WHITESPACE = 'whitespace',
 	UNKNOWN = 'unknown',
 };
 
-interface SearchToken {
+export interface SearchToken {
   index: number;
-  tokenType: TokenType;
+  tokenType: TokenTypeEnum;
   value: string;
   children: SearchToken[];
 }
 
-const patterns = {
-  [TokenType.REQUIRED_GROUP]: /^\+\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\)/g,
+export const patterns = {
+  [TokenTypeEnum.REQUIRED_GROUP]: /^\+\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\)/g,
 
-  [TokenType.FORBIDDEN_GROUP]: /^\-\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\)/g,
+  [TokenTypeEnum.FORBIDDEN_GROUP]: /^\-\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\)/g,
 
-	[TokenType.OPTIONAL_GROUP]: /^\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\)/g,
+	[TokenTypeEnum.OPTIONAL_GROUP]: /^\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\)/g,
 
-  [TokenType.REQUIRED_PHRASE]: /^\+("[^"]+")/g,
+  [TokenTypeEnum.REQUIRED_PHRASE]: /^\+("[^"]+")/g,
 
-  [TokenType.FORBIDDEN_PHRASE]: /^\-("[^"]+")/g,
+  [TokenTypeEnum.FORBIDDEN_PHRASE]: /^\-("[^"]+")/g,
 
-	[TokenType.OPTIONAL_PHRASE]: /^("[^"]+")/g,
+	[TokenTypeEnum.OPTIONAL_PHRASE]: /^("[^"]+")/g,
 
-	[TokenType.AND_CONJUNCTION]: /^(AND)/,
+	[TokenTypeEnum.AND_CONJUNCTION]: /^(AND)/,
 
-  [TokenType.OR_CONJUNCTION]: /^(OR)/,
+  [TokenTypeEnum.OR_CONJUNCTION]: /^(OR)/,
 
-  [TokenType.REQUIRED_WORD]: /^\+([^\s]+)/,
+  [TokenTypeEnum.REQUIRED_WORD]: /^\+([^\s]+)/,
 
-  [TokenType.FORBIDDEN_WORD]: /^\-([^\s]+)/,
+  [TokenTypeEnum.FORBIDDEN_WORD]: /^\-([^\s]+)/,
 
-	[TokenType.OPTIONAL_WORD]: /^([^\s]+)/,
+	[TokenTypeEnum.OPTIONAL_WORD]: /^([^\s]+)/,
 
 	[NonTokenType.WHITESPACE]: /^(\s+)/,
 
@@ -56,10 +58,10 @@ const patterns = {
 };
 
 interface FindNextTokenResult {
-    nextTokenType: TokenType | NonTokenType;
-    nextTokenValue: string;
-    nextTokenIndex: number;
-    nextSearchStringIndex: number;
+  nextTokenType: TokenTypeEnum | NonTokenType;
+  nextTokenValue: string;
+  nextTokenIndex: number;
+  nextSearchStringIndex: number;
 }
 
 const findNextToken = ({
@@ -69,14 +71,14 @@ const findNextToken = ({
   searchString: string;
   currentSearchStringIndex: number;
 }) => {
-  let nextTokenType: TokenType | NonTokenType = NonTokenType.UNKNOWN;
+  let nextTokenType: TokenTypeEnum | NonTokenType = NonTokenType.UNKNOWN;
   let nextTokenValue = '';
   let nextTokenIndex = 0;
   let nextSearchStringIndex = 0;
 
   for (nextTokenType in patterns) {
     if (nextTokenType !== NonTokenType.UNKNOWN) {
-      const pattern = patterns[nextTokenType as (TokenType | NonTokenType)];
+      const pattern = patterns[nextTokenType as (TokenTypeEnum | NonTokenType)];
       const match = searchString.substr(currentSearchStringIndex).match(pattern);
 
       if (match) {
@@ -101,7 +103,7 @@ const parseSearchString = (searchString: string) => {
   const tokens: SearchToken[] = [];
   let token: SearchToken;
   let nextToken: FindNextTokenResult;
-  let tokenType: TokenType | NonTokenType = NonTokenType.UNKNOWN;
+  let tokenType: TokenTypeEnum | NonTokenType = NonTokenType.UNKNOWN;
   let tokenValue = '';
   let tokenIndex = 0;
   let searchStringIndex = 0;
@@ -152,7 +154,7 @@ const parseSearchString = (searchString: string) => {
 
           iterate();
 
-          if (tokenType as TokenType | NonTokenType === NonTokenType.WHITESPACE) {
+          if (tokenType as TokenTypeEnum | NonTokenType === NonTokenType.WHITESPACE) {
             iterate()
           }
 
@@ -171,7 +173,7 @@ const parseSearchString = (searchString: string) => {
 
           const lastToken = tokenChildren[tokenChildren.length - 1];
 
-          tokenType = lastToken.tokenType as TokenType | NonTokenType;
+          tokenType = lastToken.tokenType as TokenTypeEnum | NonTokenType;
           tokenValue = lastToken.value;
           tokenIndex = lastToken.index;
         }
@@ -194,7 +196,7 @@ const parseSearchString = (searchString: string) => {
 
         token = {
           index: tokenIndex,
-          tokenType: tokenType as TokenType,
+          tokenType: tokenType as TokenTypeEnum,
           value: tokenValue,
           children: tokenChildren,
         };
