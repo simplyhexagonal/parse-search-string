@@ -6,8 +6,8 @@ Function to parse search strings into useful search tokens grouped by optional, 
 
 - quoted phrases (`"this is a phrase"`)
 - conjunction operators  (`AND`, `OR`)
-- groups (`(word AND "phrase in a group")`)
-- required/forbidden (`+word` or `-word` respectively)
+- parenthesis grouping (`(word AND "phrase in a group")`) (supports 2 levels of nesting)
+- required/forbidden flagging (`+word` or `-word` respectively) (can also be used to flag phrases and groups)
 
 ## Open source notice
 
